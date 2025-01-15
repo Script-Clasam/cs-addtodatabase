@@ -60,14 +60,17 @@ RegisterNetEvent('addtodatabase:checkAdmin', function()
             TriggerClientEvent('addtodatabase:isAdmin', src, false)
         end
     elseif Config.framework == 'ESX' then
-        local Player = ESX.GetPlayerFromId(src)
+        local Player = Config.FrameworkObject.GetPlayerFromId(src)
         if Player and (Player.getGroup() == 'admin' or IsStaffLicence(playerLicense)) then
             TriggerClientEvent('addtodatabase:isAdmin', src, true)
         else
             TriggerClientEvent('addtodatabase:isAdmin', src, false)
         end
+    else
+        print('Framework non détecté')
     end
 end)
+
 function IsStaffLicence(license)
     if not Config or not Config.StaffLicenses then
         return false
@@ -84,12 +87,14 @@ function GetIdentifier(playerId, idType)
     local identifiers = GetPlayerIdentifiers(playerId)
 
     for _, identifier in ipairs(identifiers) do
-        if identifier:sub(1, #idType) == idType then
+        if identifier:find(idType .. ":") then
             return identifier
         end
     end
     return nil
 end
+
+
 RegisterNetEvent('addtodatabase:addVehicle', function(brand, name, model, price, orderPrice, category, type, requiredLicense)
     exports.oxmysql:insert('INSERT INTO vehicles (brand, name, model, price, orderprice, category, type, requiredLicense) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', {
         brand, name, model, price, orderPrice or 0, category, type, requiredLicense or 'none'
